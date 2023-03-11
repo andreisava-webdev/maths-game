@@ -1,9 +1,27 @@
+var currentScore = 0;
+var highScore = 0;
 var seconds = 10;
 var timer;
+var gameStarted = false;
+
+var displayCurrentScore = function () {
+  $('.currentScore').html(currentScore);
+};
+
+var displayHighScore = function () {
+  $('.highScore').html(highScore);
+};
 
 var displayQuestion = function (question) {
   $('.question').html(`<p>${question}</p>`);
 };
+
+var displayTimer = function () {
+  $('.timer').html(seconds);
+};
+
+displayCurrentScore();
+displayHighScore();
 
 var generateQuestion = function () {
   var firstNumber = Math.floor(Math.random() * 10 + 1);
@@ -17,29 +35,21 @@ var generateQuestion = function () {
   return { text, answer };
 };
 
-var question = generateQuestion();
-
-$('#userAnswer').on('input', function () {
-  var userAnswer = $(this).val();
-
-  if (parseFloat(userAnswer) === question.answer) {
-    seconds++;
-    updateTimer();
-    question = generateQuestion();
-    displayQuestion(question.text);
-    $(this).val('');
-  }
-});
-
 var updateTimer = function () {
   if (seconds === 0) {
     clearInterval(timer);
-    $('#userAnswer').attr('disabled', true);
+    highScore = currentScore;
+    currentScore = 0;
+    displayCurrentScore();
+    displayHighScore();
+    gameStarted = false;
+    seconds = 10;
   }
-  $('.timer').html(seconds);
+  displayTimer();
 };
 
 var startGame = function () {
+  gameStarted = true;
   updateTimer();
   timer = setInterval(function () {
     seconds--;
@@ -47,4 +57,23 @@ var startGame = function () {
   }, 1000);
 };
 
-startGame();
+var question = generateQuestion();
+updateTimer();
+
+$('#userAnswer').on('input', function () {
+  if (!gameStarted) {
+    startGame();
+  }
+
+  var userAnswer = $(this).val();
+
+  if (parseFloat(userAnswer) === question.answer) {
+    currentScore++;
+    displayCurrentScore();
+    seconds++;
+    updateTimer();
+    question = generateQuestion();
+    displayQuestion(question.text);
+    $(this).val('');
+  }
+});
