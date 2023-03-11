@@ -20,6 +20,14 @@ var displayTimer = function () {
   $('.timer').html(seconds);
 };
 
+var toggleQuestion = function () {
+  $('.question').toggleClass('d-none');
+};
+
+var toggleRestartBtn = function () {
+  $('.restartBtn').toggleClass('d-none');
+};
+
 displayCurrentScore();
 displayHighScore();
 
@@ -43,7 +51,9 @@ var updateTimer = function () {
     displayCurrentScore();
     displayHighScore();
     gameStarted = false;
-    seconds = 10;
+    $('#userAnswer').attr('disabled', true);
+    toggleQuestion();
+    toggleRestartBtn();
   }
   displayTimer();
 };
@@ -58,7 +68,7 @@ var startGame = function () {
 };
 
 var question = generateQuestion();
-updateTimer();
+displayTimer();
 
 $('#userAnswer').on('input', function () {
   if (!gameStarted) {
@@ -76,4 +86,14 @@ $('#userAnswer').on('input', function () {
     displayQuestion(question.text);
     $(this).val('');
   }
+});
+
+$('.restartBtn').on('click', function () {
+  seconds = 10;
+  question = generateQuestion();
+  displayTimer();
+  displayQuestion(question.text);
+  toggleQuestion();
+  toggleRestartBtn();
+  $('#userAnswer').attr('disabled', false);
 });
